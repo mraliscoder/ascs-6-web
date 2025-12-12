@@ -12,10 +12,30 @@
         <div class="row">
             <div class="col-12 text-center">
                 <h1 class="mb-4">Login in!~~</h1>
+
+                <?php
+                iF (!isset($_COOKIE['User'])) {
+                ?>
+
                 <div class="d-flex justify-content-center gap-3">
                     <a href="/registration.php" class="btn btn-primary">Registration</a>
                     <a href="/login.php" class="btn btn-primary">Login</a>
                 </div>
+
+                <?php
+                } else {
+                    require_once('db.php');
+                    $sql = "SELECT * FROM posts";
+                    $res = mysqli_query($link, $sql);
+                    if (mysqli_num_rows($res) > 0) {
+                        while ($post = mysqli_fetch_array($res)) {
+                            echo "<a href='/posts.php?id=" . $post['id'] . "'>" . $post['title'] . "</a><br>";
+                        }
+                    } else {
+                        echo "No posts!";
+                    }
+                }
+                ?>
             </div>
         </div>
     </div>

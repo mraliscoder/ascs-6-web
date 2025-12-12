@@ -1,3 +1,13 @@
+<?php
+require_once "db.php";
+$id = $_GET['id'];
+$sql = "SELECT * FROM posts WHERE id=$id";
+$result = mysqli_query($link, $sql);
+$rows = mysqli_fetch_array($result);
+$title = $rows['title'];
+$main_text = html_entity_decode($rows['main_text']);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +21,12 @@
     <div class="container d-flex justify-content-center align-items-center vh-100">
         <div class="row">
             <div class="col-12 text-center">
+                <?php
+
+                echo "<h1>$title</h1>";
+                echo "<p>$main_text</p>";
+
+                ?>
             </div>
         </div>
     </div>

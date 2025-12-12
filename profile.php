@@ -14,6 +14,11 @@
                 <img src="logohack.webp" alt="Site logo" class="me-2">
                 <span class="text-light">History</span>
             </a>
+            <?php if (isset($_COOKIE['User'])): ?>
+                <form action="/logout.php" method="POST" class="d-flex">
+                    <button class="btn btn-outline-danger" type="submit">Logout</button>
+                </form>
+            <?php endif; ?>
         </div>
     </nav>
 
@@ -45,7 +50,7 @@
                     <label for="postTitle" class="file">Upload file</label>
                     <input type="file" name="file" class="form-control hacker-input" id="file">
                 </div>
-                <div class="btn btn-primary" type="submit" name="submit">Save Post</div>
+                <button class="btn btn-primary" type="submit" name="submit">Save Post</button>
             </form>
         </div>
     </div>
@@ -54,3 +59,41 @@
     <script src="js/script.js"></script>
 </body>
 </html>
+
+<?php
+if (!isset($_COOKIE['User'])) {
+    header('Location: /login.php');
+    exit;
+}
+
+require_once "db.php";
+
+if (isset($_POST['submit'])) {
+    $title = $_POST['postTitle'];
+    $main_text = $_POST['postContent'];
+
+    if (!$title || !$main_text) die("No post data");
+
+    $pictureData = "";
+
+    if (!empty($_FILES['file'])) {
+        $allowedMimeTypes = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png"];
+        if (@in_array($_FILES['file']['type'], $allowedMimeTypes) && (@$_FILES['file']['size'] < 102400)) {
+            move_uploaded_file($_FILES['file']['tmp_name'], "upload/" . $_FILES['file']['name']);
+            echo "Picture uploaded<br>";
+            $pictureData = "<img src='/upload/" . $_FILES['file']['name'] . "' alt='Article img'><br>";
+        } else {
+            echo "Upload failed";
+        }
+    }
+
+    $main_text = htmlentities($pictureData) . $main_text;
+
+    $sql = "INSERT INTO posts(title, main_text) VALUES('$title', '$main_text')";
+    if (!mysqli_query($link, $sql)) {
+        die("Failed to insert post data: " . mysqli_error($link));
+    }
+    echo "Post saved!";
+}
+
+?>
